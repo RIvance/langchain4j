@@ -1,21 +1,20 @@
 package dev.langchain4j.model.llama;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 @SuppressWarnings("unused")
 public class LlamaCppBackend {
 
     private LlamaCppBackend() { }
 
-    @AllArgsConstructor
     public enum LlamaVocabType {
         SPM(0), // SentencePiece
         BPE(1); // Byte Pair Encoding
         public final int id;
+
+        LlamaVocabType(int id) {
+            this.id = id;
+        }
     }
 
-    @AllArgsConstructor
     public enum LlamaTokenType {
         UNDEFINED(0),
         NORMAL(1),
@@ -25,10 +24,13 @@ public class LlamaCppBackend {
         UNUSED(5),
         BYTE(6);
         public final int id;
+
+        LlamaTokenType(int id) {
+            this.id = id;
+        }
     }
 
     // model file types
-    @AllArgsConstructor
     public enum LlamaFileType {
         ALL_F32(0),
         MOSTLY_F16(1),                  // except 1d tensors
@@ -51,9 +53,12 @@ public class LlamaCppBackend {
         MOSTLY_Q6_K(18),                // except 1d tensors
         GUESSED(1024);                  // not specified in the model file
         public final int id;
+
+        LlamaFileType(int id) {
+            this.id = id;
+        }
     }
 
-    @AllArgsConstructor
     public enum LlamaRopeScalingType {
         SCALING_UNSPECIFIED(-1),
         SCALING_NONE(0),
@@ -61,20 +66,34 @@ public class LlamaCppBackend {
         SCALING_YARN(2),
         SCALING_MAX_VALUE(LlamaRopeScalingType.SCALING_YARN.id);
         public final int id;
+
+        LlamaRopeScalingType(int id) {
+            this.id = id;
+        }
     }
 
-    @Data
     public static class LlamaTokenData {
         public final int id;        // token id
         public final float logit;   // log-odds of the token
         public final float p;       // probability of the token
+
+        public LlamaTokenData(int id, float logit, float p) {
+            this.id = id;
+            this.logit = logit;
+            this.p = p;
+        }
     }
 
-    @Data
     public static class LlamaTokenDataArray {
         public final long data;         // llama_token_data*
         public final long size;         // size of the array
         public final boolean sorted;
+
+        public LlamaTokenDataArray(long data, long size, boolean sorted) {
+            this.data = data;
+            this.size = size;
+            this.sorted = sorted;
+        }
     }
 
     // Input data for llama_decode
@@ -87,7 +106,6 @@ public class LlamaCppBackend {
     // - seq_id : the sequence to which the respective token belongs
     // - logits : if zero, the logits for the respective token will not be output
     //
-    @Data
     public static class LlamaBatch {
         public final int nTokens;
         public final long token;    // llama_token*
@@ -105,9 +123,22 @@ public class LlamaCppBackend {
         public final int allPos0;   // llama_pos
         public final int allPos1;   // llama_pos
         public final int allSeqId;  // llama_seq_id
+
+        public LlamaBatch(int nTokens, long token, long embd, long pos, long nSeqId,
+                          long seqId, long logits, int allPos0, int allPos1, int allSeqId) {
+            this.nTokens = nTokens;
+            this.token = token;
+            this.embd = embd;
+            this.pos = pos;
+            this.nSeqId = nSeqId;
+            seq_id = seqId;
+            this.logits = logits;
+            this.allPos0 = allPos0;
+            this.allPos1 = allPos1;
+            this.allSeqId = allSeqId;
+        }
     }
 
-    @Data
     public static class LlamaModelParams {
         public final int nGpuLayers;                // number of layers to store in VRAM
         public final int mainGpu;                   // the GPU that is used for scratch and small tensors
@@ -117,9 +148,20 @@ public class LlamaCppBackend {
         public final boolean vocabOnly;             // only load the vocabulary, no weights
         public final boolean useMmap;               // use mmap if possible
         public final boolean useMlock;              // force system to keep model in RAM
+
+        public LlamaModelParams(int nGpuLayers, int mainGpu, long tensorSplit, long progressCallback,
+                                long progressCallbackUserData, boolean vocabOnly, boolean useMmap, boolean useMlock) {
+            this.nGpuLayers = nGpuLayers;
+            this.mainGpu = mainGpu;
+            this.tensorSplit = tensorSplit;
+            this.progressCallback = progressCallback;
+            this.progressCallbackUserData = progressCallbackUserData;
+            this.vocabOnly = vocabOnly;
+            this.useMmap = useMmap;
+            this.useMlock = useMlock;
+        }
     }
 
-    @Data
     public static class LlamaContextParams {
         public final int seed;              // RNG seed, -1 for random
         public final int nCtx;              // text context, 0 = from model
@@ -142,10 +184,32 @@ public class LlamaCppBackend {
         public final boolean f16Kv;         // use fp16 for KV cache, fp32 otherwise
         public final boolean logitsAll;     // the llama_eval() call computes all logits, not just the last one
         public final boolean embedding;     // embedding mode only
+
+        public LlamaContextParams(int seed, int nCtx, int nBatch, int nThreads, int nThreadsBatch, int ropeScalingType,
+                                  float ropeFreqBase, float ropeFreqScale, float yarnExtFactor, float yarnAttnFactor,
+                                  float yarnBetaFast, float yarnBetaSlow, int yarnOrigCtx, boolean mulMatQ, boolean f16Kv,
+                                  boolean logitsAll, boolean embedding) {
+            this.seed = seed;
+            this.nCtx = nCtx;
+            this.nBatch = nBatch;
+            this.nThreads = nThreads;
+            this.nThreadsBatch = nThreadsBatch;
+            this.ropeScalingType = ropeScalingType;
+            this.ropeFreqBase = ropeFreqBase;
+            this.ropeFreqScale = ropeFreqScale;
+            this.yarnExtFactor = yarnExtFactor;
+            this.yarnAttnFactor = yarnAttnFactor;
+            this.yarnBetaFast = yarnBetaFast;
+            this.yarnBetaSlow = yarnBetaSlow;
+            this.yarnOrigCtx = yarnOrigCtx;
+            this.mulMatQ = mulMatQ;
+            this.f16Kv = f16Kv;
+            this.logitsAll = logitsAll;
+            this.embedding = embedding;
+        }
     }
 
     // model quantization parameters
-    @Data
     public static class LlamaModelQuantizeParams {
         public final int nThread;                 // number of threads to use for quantizing, if <=0 will use std::thread::hardware_concurrency()
         public final int fType;                   // [llama_ftype] quantize to this llama_ftype
@@ -153,10 +217,19 @@ public class LlamaCppBackend {
         public final boolean quantizeOutputTensor;// quantize output.weight
         public final boolean onlyCopy;            // only copy tensors - ftype, allow_requantize and quantize_output_tensor are ignored
         public final boolean pure;                // disable k-quant mixtures and quantize all tensors to the same type
+
+        public LlamaModelQuantizeParams(int nThread, int fType, boolean allowRequantize,
+                                        boolean quantizeOutputTensor, boolean onlyCopy, boolean pure) {
+            this.nThread = nThread;
+            this.fType = fType;
+            this.allowRequantize = allowRequantize;
+            this.quantizeOutputTensor = quantizeOutputTensor;
+            this.onlyCopy = onlyCopy;
+            this.pure = pure;
+        }
     }
 
     // grammar element type
-    @AllArgsConstructor
     enum LlamaGreType {
         END(0),
         ALT(1),
@@ -166,16 +239,23 @@ public class LlamaCppBackend {
         CHAR_RNG_UPPER(5),
         CHAR_ALT(6);
         public final int id;
+
+        LlamaGreType(int id) {
+            this.id = id;
+        }
     }
 
-    @Data
     public static class LlamaGrammarElement {
         public final int type;   // [llama_gretype]
         public final int value;  // Unicode code point or rule ID
+
+        public LlamaGrammarElement(int type, int value) {
+            this.type = type;
+            this.value = value;
+        }
     }
 
     // performance timing information
-    @Data
     public static class LlamaTimings {
         public final double tStartMs;
         public final double tEndMs;
@@ -186,6 +266,19 @@ public class LlamaCppBackend {
         public final int nSample;
         public final int nPEval;
         public final int nEval;
+
+        public LlamaTimings(double tStartMs, double tEndMs, double tLoadMs, double tSampleMs, double tPEvalMs,
+                            double tEvalMs, int nSample, int nPEval, int nEval) {
+            this.tStartMs = tStartMs;
+            this.tEndMs = tEndMs;
+            this.tLoadMs = tLoadMs;
+            this.tSampleMs = tSampleMs;
+            this.tPEvalMs = tPEvalMs;
+            this.tEvalMs = tEvalMs;
+            this.nSample = nSample;
+            this.nPEval = nPEval;
+            this.nEval = nEval;
+        }
     }
 
     /**
@@ -220,7 +313,7 @@ public class LlamaCppBackend {
      * @param params [const struct llama_model_params] Model parameters
      * @return struct llama_model *
      */
-    public native static long llamaLoadModelFromFile(char[] pathModel, LlamaModelParams params);
+    public native static long llamaLoadModelFromFile(String pathModel, LlamaModelParams params);
 
     /**
      * @param model [const struct llama_model *] model
@@ -304,7 +397,7 @@ public class LlamaCppBackend {
      * @param bufSize [size_t]
      * @return [int]
      */
-    public native static int llamaModelMetaValStr(long model, char[] key, char[] buf, long bufSize);
+    public native static int llamaModelMetaValStr(long model, String key, byte[] buf, long bufSize);
 
     /**
      * Get the number of metadata key/value pairs
@@ -321,7 +414,7 @@ public class LlamaCppBackend {
      * @param bufSize [size_t]
      * @return [int]
      */
-    public native static int llamaModelMetaKeyByIndex(long model, int i, char[] buf, long bufSize);
+    public native static int llamaModelMetaKeyByIndex(long model, int i, byte[] buf, long bufSize);
 
     /**
      * Get metadata value as a string by index
@@ -331,7 +424,7 @@ public class LlamaCppBackend {
      * @param bufSize [size_t]
      * @return [int]
      */
-    public native static int llamaModelMetaValStrByIndex(long model, int i, char[] buf, long bufSize);
+    public native static int llamaModelMetaValStrByIndex(long model, int i, byte[] buf, long bufSize);
 
     /**
      * Get a string describing the model type
@@ -340,7 +433,7 @@ public class LlamaCppBackend {
      * @param bufSize [size_t]
      * @return [int]
      */
-    public native static int llamaModelDesc(long model, char[] buf, long bufSize);
+    public native static int llamaModelDesc(long model, byte[] buf, long bufSize);
 
     /**
      * Returns the total size of all the tensors in the model in bytes
@@ -362,7 +455,7 @@ public class LlamaCppBackend {
      * @param name [const char *] tensor name
      * @return [struct ggml_tensor *]
      */
-    public native static long llamaGetModelTensor(long model, char[] name);
+    public native static long llamaGetModelTensor(long model, String name);
 
     /**
      * Returns 0 on success
@@ -387,17 +480,19 @@ public class LlamaCppBackend {
     /**
      * Information associated with an individual cell in the KV cache view.
      */
-    @Data
     public static class KvCacheViewCell {
         // The position for this cell. Takes KV cache shifts into account.
         // May be negative if the cell is not populated.
         public final int pos;
+
+        public KvCacheViewCell(int pos) {
+            this.pos = pos;
+        }
     }
 
     /**
      * An updateable view of the KV cache.
      */
-    @Data
     public static class KvCacheView {
 
         // Number of KV cache cells. This will be the same as the context size.
@@ -428,6 +523,18 @@ public class LlamaCppBackend {
 
         // The sequences for each cell. There will be n_max_seq items per cell.
         public final long cellsSequences;
+
+        public KvCacheView(int nCells, int nMaxSeq, int tokenCount, int usedCells, int maxContiguous,
+                           int maxContiguousIdx, long cells, long cellsSequences) {
+            this.nCells = nCells;
+            this.nMaxSeq = nMaxSeq;
+            this.tokenCount = tokenCount;
+            this.usedCells = usedCells;
+            this.maxContiguous = maxContiguous;
+            this.maxContiguousIdx = maxContiguousIdx;
+            this.cells = cells;
+            this.cellsSequences = cellsSequences;
+        }
     }
 
     /**
@@ -556,7 +663,7 @@ public class LlamaCppBackend {
      * @return [bool]
      */
     public native static boolean llamaLoadSessionFile(
-            long ctx, char[] pathSession, long tokensOut, long nTokenCapacity, long nTokenCountOut);
+            long ctx, String pathSession, long tokensOut, long nTokenCapacity, long nTokenCountOut);
 
     /**
      * Save a session file
@@ -566,7 +673,7 @@ public class LlamaCppBackend {
      * @param nTokenCount [size_t]
      * @return [bool]
      */
-    public native static boolean llamaSaveSessionFile(long ctx, char[] pathSession, long tokens, long nTokenCount);
+    public native static boolean llamaSaveSessionFile(long ctx, String pathSession, long tokens, long nTokenCount);
 
     //
     // Decoding
@@ -660,7 +767,7 @@ public class LlamaCppBackend {
      * @param token [llama_token]
      * @return [char *]
      */
-    public native static char[] llamaTokenGetText(long model, int token);
+    public native static String llamaTokenGetText(long model, int token);
 
     /**
      * @param model [const struct llama_model *]
@@ -772,7 +879,7 @@ public class LlamaCppBackend {
      * @param length [int]
      * @return [int]
      */
-    public native static int llamaTokenToPiece(long model, int token, char[] buf, int length);
+    public native static int llamaTokenToPiece(long model, int token, byte[] buf, int length);
 
     //
     // Grammar
@@ -966,12 +1073,18 @@ public class LlamaCppBackend {
     // Beam search
     //
 
-    @Data
     public static class BeamView {
         public final long tokens;
         public final long nTokens;
         public final float p;       // Cumulative beam probability (renormalized relative to all beams)
         public final boolean eob;   // Callback should set this to true when a beam is at end-of-beam.
+
+        public BeamView(long tokens, long nTokens, float p, boolean eob) {
+            this.tokens = tokens;
+            this.nTokens = nTokens;
+            this.p = p;
+            this.eob = eob;
+        }
     }
 
     /**
@@ -980,12 +1093,18 @@ public class LlamaCppBackend {
      * (e.g. beams[0]) as they will be removed (shifted) from all beams in all subsequent callbacks.
      * These pointers are valid only during the synchronous callback, so should not be saved.
      */
-    @Data
     public static class BeamsState {
         public final long beamViews;
         public final long nBeams;               // Number of elements in beam_views[].
         public final long commonPrefixLength;   // Current max length of prefix tokens shared by all beams.
         public final boolean lastCall;          // True iff this is the last callback invocation.
+
+        public BeamsState(long beamViews, long nBeams, long commonPrefixLength, boolean lastCall) {
+            this.beamViews = beamViews;
+            this.nBeams = nBeams;
+            this.commonPrefixLength = commonPrefixLength;
+            this.lastCall = lastCall;
+        }
     }
 
     // Type of pointer to the beam_search_callback function.
@@ -1026,7 +1145,7 @@ public class LlamaCppBackend {
      * Print system information
      * @return [const char *]
      */
-    public native static char[] llamaPrintSystemInfo();
+    public native static String llamaPrintSystemInfo();
 
     /**
      * Set callback for all future logging events.
