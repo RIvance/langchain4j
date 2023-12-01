@@ -12,6 +12,9 @@
     <name>langchain4j parent POM</name>
     <description>Parent POM for langchain4j submodules</description>
     <url>https://github.com/langchain4j/langchain4j</url>
+    <modules>
+        <module>../langchain4j-llama-cpp</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
